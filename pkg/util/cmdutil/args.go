@@ -18,6 +18,7 @@ import (
 	"github.com/hashicorp/go-multierror"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"github.com/pulumi/pulumi/pkg/util/contract"
 )
 
 // ArgsFunc wraps a standard cobra argument validator with standard Pulumi error handling.
@@ -25,6 +26,7 @@ func ArgsFunc(argsValidator cobra.PositionalArgs) cobra.PositionalArgs {
 	return func(cmd *cobra.Command, args []string) error {
 		err := argsValidator(cmd, args)
 		if err != nil {
+			contract.IgnoreError(cmd.Help())
 			Exit(err)
 		}
 
