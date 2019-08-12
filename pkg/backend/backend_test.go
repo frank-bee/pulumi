@@ -131,6 +131,7 @@ type mockBackend struct {
 	URLF                    func() string
 	GetPolicyPackF          func(ctx context.Context, policyPack string, d diag.Sink) (PolicyPack, error)
 	ParseStackReferenceF    func(s string) (StackReference, error)
+	DoesProjectExistF       func(context.Context, string) (bool, error)
 	GetStackF               func(context.Context, StackReference) (Stack, error)
 	CreateStackF            func(context.Context, StackReference, interface{}) (Stack, error)
 	RemoveStackF            func(context.Context, StackReference, bool) (bool, error)
@@ -186,6 +187,13 @@ func (be *mockBackend) GetPolicyPack(
 func (be *mockBackend) ParseStackReference(s string) (StackReference, error) {
 	if be.ParseStackReferenceF != nil {
 		return be.ParseStackReferenceF(s)
+	}
+	panic("not implemented")
+}
+
+func (be *mockBackend) DoesProjectExist(ctx context.Context, projectName string) (bool, error) {
+	if be.DoesProjectExistF != nil {
+		return be.DoesProjectExistF(ctx, projectName)
 	}
 	panic("not implemented")
 }

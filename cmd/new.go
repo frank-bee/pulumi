@@ -201,8 +201,12 @@ func newNewCmd() *cobra.Command {
 			// Prompt for the project name, if it wasn't already specified.
 			if name == "" {
 				defaultValue := workspace.ValueOrSanitizedDefaultProjectName(name, template.ProjectName, filepath.Base(cwd))
-				name, err = promptForValue(
-					yes, "project name", defaultValue, false, workspace.ValidateProjectName, opts)
+				if err := validateProjectName(defaultValue, opts); err != nil {
+					// Do not suggest an invalid or existing name as the default project name
+					defaultValue = ""
+				}
+				validate := func(s string) error { return validateProjectName(s, opts) }
+				name, err = promptForValue(yes, "project name", defaultValue, false, validate, opts)
 				if err != nil {
 					return err
 				}
@@ -362,6 +366,29 @@ func errorIfNotEmptyDirectory(path string) error {
 	if len(infos) > 0 {
 		return errors.Errorf("%s is not empty; "+
 			"rerun in an empty directory, pass the path to an empty directory to --dir, or use --force", path)
+	}
+
+	return nil
+}
+
+func validateProjectName(projectName string, opts display.Options) error {
+	err := workspace.ValidateProjectName(projectName)
+	if err != nil {
+		return err
+	}
+
+	b, err := currentBackend(opts)
+	if err != nil {
+		return err
+	}
+
+	exists, err := b.DoesProjectExist(commandContext(), projectName)
+	if err != nil {
+		return err
+	}
+
+	if exists {
+		return errors.New("A project with this name already exists")
 	}
 
 	return nil
