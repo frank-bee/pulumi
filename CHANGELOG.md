@@ -17,6 +17,9 @@ CHANGELOG
 - Fix a bug in the Python SDK that caused crashes when using asynchronous data sources.
   [#3056](https://github.com/pulumi/pulumi/pull/3056)
 
+- Check the uniqueness of the project name during pulumi new
+  [#3065](https://github.com/pulumi/pulumi/pull/3065)
+
 ## 0.17.28 (2019-08-05)
 
 - Retry renaming a temporary folder during plugin installation
